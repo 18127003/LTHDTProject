@@ -217,3 +217,14 @@ EAGLE::~EAGLE()
 	for (size_t i = 0; i < s; ++i) G_DestroyTexture(texture[i]);
 	G_FreeSound(sound);
 }
+COIN::~COIN()
+{
+	instance--;
+	if (instance == 0)
+	{
+		cout << "Coin model deleted" << endl;
+		size_t s = texture.size();
+		for (size_t i = 0; i < s; ++i) G_DestroyTexture(texture[i]);
+		G_FreeSound(sound);
+	}
+}

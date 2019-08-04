@@ -107,8 +107,11 @@ public:
 };
 class COIN :public Object
 {
+private:
+	static int instance;
 public:
-	COIN() = default;
-	COIN(const Object* other) : Object(*other) {}
+	COIN() { instance++; };
+	COIN(const Object* other) : Object(*other) { instance++; }
 	void self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move);
+	~COIN();
 };
