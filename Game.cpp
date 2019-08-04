@@ -76,3 +76,98 @@ void Game::initTiles()
 		}
 	}
 }
+void Game::addStick(int row)
+{
+	ObjModel[1]->position.y = map[0][row].position.y;
+	ObjModel[1]->tile.y = row;
+	if (map[0][row + 1].type == WATER) { // Direction of two rivers should be diffrent.
+		for (int i = objects.size() - 1; i >= 0; i--) {
+			if (objects[i]->tile.y == row + 1 && dynamic_cast<STICK*>(objects[i]) != NULL)
+			{
+				ObjModel[1]->dir = (objects[i]->dir == LEFT ? RIGHT : LEFT);
+				ObjModel[1]->isMoving = (objects[i]->isMoving ? rand() % 2 : true); //We Cant Have Two Stopped Rivers
+				break;
+			}
+		}
+	}
+	else
+	{
+		ObjModel[1]->isMoving = rand() % 2;
+		ObjModel[1]->dir = (Direction)((rand() % 2) + 2);
+	}
+
+	if (ObjModel[1]->isMoving)
+	{
+		ObjModel[1]->moveSpeed = (rand() % 3 + 1) * (ObjModel[1]->dir == RIGHT ? 1 : -1);
+		int num = (rand() % 4) + 3;
+		int space = (windowPos.w - ((num - 1) * ObjModel[1]->position.w)) / num;
+		int randPos = rand() % 200;
+		for (int i = 0; i < num; i++)
+		{
+			Object *StickDup = new STICK(ObjModel[1]);
+			objects.push_back(StickDup);///////////////////////////////////////////////////////////
+			if (ObjModel[1]->dir == LEFT)
+				objects.back()->position.x = randPos + (i*(space + ObjModel[1]->position.w));
+			else
+				objects.back()->position.x = windowPos.w - randPos - (i*(space + ObjModel[1]->position.w));
+		}
+	}
+	else
+	{
+		int num = 0;
+		do {
+			for (int i = 0; i < columns; i++)
+			{
+				if (map[i][row + 1].type != TREE) {
+					int chance = rand() % 100 + 1;
+					if (chance >= 50 && num < maxSticksInARow) {
+						num++;
+						ObjModel[1]->position.x = map[i][row].position.x;
+						Object *StickDup = new STICK(ObjModel[1]);
+						objects.push_back(StickDup);/////////////////////////////////////////
+					}
+				}
+			}
+		} while (num < minSticksInARow);
+	}
+}
+void Game::addTrain(int row)
+{
+	Direction dir = (Direction)((rand() % 2) + 2);
+	ObjModel[2]->dir = dir;
+	ObjModel[2]->position.y = map[0][row].position.y;
+	ObjModel[2]->tile.y = row;
+	ObjModel[2]->timer = ((rand() % 5) + 2) * FPS;
+	ObjModel[2]->random_skin();
+	Object* TrainDup = new TRAIN(ObjModel[2]);
+	objects.push_back(TrainDup);////////////////////////////////////////
+	if (dir == LEFT)
+		objects.back()->position.x = windowPos.w + ObjModel[2]->position.w;
+	else
+		objects.back()->position.x = -ObjModel[2]->position.w;
+
+	ObjModel[3]->tile.y = row;
+	ObjModel[3]->position.y = map[0][row].position.y + TILE_LENGTH - ObjModel[3]->position.h;
+	ObjModel[3]->position.x = map[0][row].position.x + 20;
+	Object *LampDup = new LAMP(ObjModel[3]);
+	objects.push_back(LampDup);////////////////////////////////////////////////
+}
+void Game::addCoins(int row)
+{
+	int num = 0;
+	ObjModel[5]->position.y = map[0][row].position.y;
+	ObjModel[5]->position.w = ObjModel[5]->position.h = 100;
+	ObjModel[5]->tile.y = row;
+	for (int i = 0; i < columns; i++)
+	{
+		if (map[i][row].type != TREE) {
+			int chance = rand() % 101;
+			if (chance >= 90 && num < maxCoinsInARow) {
+				num++;
+				ObjModel[5]->position.x = map[i][row].position.x;
+				Object *CoinDup = new COIN(ObjModel[5]);
+				objects.push_back(CoinDup);//////////////////////////////////////////
+			}
+		}
+	}
+}

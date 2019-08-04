@@ -45,3 +45,6 @@ public:
 	void drawObjects();
 	void drawTiles();
 	void initTiles();
+	void addStick(int row);
+	void addTrain(int row);
+	void addCoins(int row);
