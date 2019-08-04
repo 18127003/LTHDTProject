@@ -82,6 +82,10 @@ void Object::random_skin()
 {
 	change_skin(rand() % texture.size());
 }
+void Object::Playsound()
+{
+	G_PlaySound(sound, 0);
+}
 void Player::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
 {
 	texture.push_back(G_LoadImage(file));

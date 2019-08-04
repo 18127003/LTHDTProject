@@ -28,6 +28,7 @@ public:
 	void add_texture(const char *file);
 	void random_skin();
 	void change_skin(size_t n);
+	void Playsound();
 	Object();
 	Object(const Object& other);
 	~Object();
