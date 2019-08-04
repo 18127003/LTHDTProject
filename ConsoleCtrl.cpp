@@ -48,3 +48,17 @@ void ConsoleCtrl::update_score()
 	CoinText.self_update(font, chars);
 }
 
+void ConsoleCtrl::UIdraw()
+{
+	ScoreText.self_draw();
+	CoinText.self_draw();
+	QuitButton.self_draw();
+}
+void ConsoleCtrl::pause()
+{
+	G_Rect pauseRect = { (new_game.windowPos.w - 402) / 2,(new_game.windowPos.h - 512) / 2,402,512 };
+	PauseButton.self_draw(pauseRect);
+	if (QuitButton.clickOnButton(gameEvent, onSound)) new_game.SetState(QUIT);
+	else if (gameEvent == G_MOUSEBUTTONDOWN && G_Mouse == G_BUTTON_LEFT)
+		new_game.SetState(PLAY);
+}

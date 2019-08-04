@@ -22,5 +22,7 @@ public:
 	~ConsoleCtrl();
 	void loadUI();
 	void update_score();
+	void UIdraw();
+	void pause();
 };
 
