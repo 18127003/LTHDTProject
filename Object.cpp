@@ -151,3 +151,14 @@ Player::~Player()
 	for (size_t i = 0; i < s; ++i) G_DestroyTexture(texture[i]);
 	G_FreeSound(sound);
 }
+CAR::~CAR()
+{
+	instance--;
+	if (instance == 0)
+	{
+		cout << "Car model deleted" << endl;
+		size_t s = texture.size();
+		for (size_t i = 0; i < s; ++i) G_DestroyTexture(texture[i]);
+		G_FreeSound(sound);
+	}
+}
