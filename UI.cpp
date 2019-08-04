@@ -33,3 +33,20 @@ int UI::getPos(char dim)
 	if (dim == 'y') return position.y;
 	return position.x;
 }
+void Icon::self_update(G_Font* font, char* chars)
+{
+	G_DestroyTexture(texture);
+	texture = G_LoadFont(font, chars, 255, 255, 255);
+}
+void UI::self_draw()
+{
+	G_Draw(texture, &position);
+}
+void UI::self_draw(G_Rect pos)
+{
+	G_Draw(texture, &pos);
+}
+void UI::settexture(G_Texture* txture)
+{
+	texture = txture;
+}
