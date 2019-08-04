@@ -69,10 +69,13 @@ public:
 };
 class TRAIN :public Object
 {
+private:
+	static int instance;
 public:
-	TRAIN() = default;
-	TRAIN(const Object* other) : Object(*other) {}
+	TRAIN() { instance++; };
+	TRAIN(const Object* other) : Object(*other) { instance++; }
 	void self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move);
+	~TRAIN();
 };
 class STICK :public Object
 {
