@@ -101,6 +101,10 @@ void CAR::self_load(const char *file, int pos1, int pos2, int posx, int posy, co
 	isMoving = Is_move;
 	sound = G_LoadSound(sfile);
 }
+void ANIMAL::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
+{
+	Object::self_load(file, pos1, pos2, posx, posy, sfile, Is_move);
+}
 void STICK::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
 {
 	texture.push_back(G_LoadImage(file));
@@ -157,6 +161,17 @@ CAR::~CAR()
 	if (instance == 0)
 	{
 		cout << "Car model deleted" << endl;
+		size_t s = texture.size();
+		for (size_t i = 0; i < s; ++i) G_DestroyTexture(texture[i]);
+		G_FreeSound(sound);
+	}
+}
+ANIMAL::~ANIMAL()
+{
+	instance--;
+	if (instance == 0)
+	{
+		cout << "Animal model deleted" << endl;
 		size_t s = texture.size();
 		for (size_t i = 0; i < s; ++i) G_DestroyTexture(texture[i]);
 		G_FreeSound(sound);
