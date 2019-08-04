@@ -31,7 +31,7 @@ public:
 	void Playsound();
 	Object();
 	Object(const Object& other);
-	~Object();
+	virtual ~Object();
 	friend class Game;
 };
 
