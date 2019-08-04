@@ -24,3 +24,12 @@ public:
 	void self_load(G_Font* font, const char* cont, int ft1, int ft2, int ft3, int pos1, int pos2, int pos3, int pos4);
 	void self_update(G_Font* font, char* chars);
 };
+class Button :public UI
+{
+private:
+	G_Sound* clickSound = NULL;
+public:
+	~Button();
+	bool clickOnButton(int& gameEvent, bool onSound);
+	void self_load(const char* file, int pos1, int pos2, int pos3, int pos4, G_Sound* sound);
+};

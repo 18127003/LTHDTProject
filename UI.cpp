@@ -50,3 +50,13 @@ void UI::settexture(G_Texture* txture)
 {
 	texture = txture;
 }
+bool Button::clickOnButton(int& gameEvent, bool onSound)
+{
+	SDL_Point mouse_point = { G_motion.x , G_motion.y };
+	if (gameEvent == G_MOUSEBUTTONDOWN && G_Mouse == G_BUTTON_LEFT && SDL_PointInRect(&mouse_point, &position))
+	{
+		if (onSound == true) G_PlaySound(clickSound, 0);
+		return true;
+	}
+	return false;
+}
