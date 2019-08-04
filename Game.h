@@ -67,3 +67,6 @@ public:
 	void Playsound(T* obj);
 	void checkPlayerStatus();
 	void adjustCameraSpeed();
+	void update();
+	void SetState(enum GameState stat) { state = stat; }
+	void PlayerMove();

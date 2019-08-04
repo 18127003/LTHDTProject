@@ -479,3 +479,139 @@ void Game::checkPlayerStatus()
 	if (!Player.isMoving && !onStick && map[Player.tile.x][Player.tile.y].type == WATER)
 		state = GAME_OVER;
 }
+void Game::update()
+{
+	adjustCameraSpeed();
+
+	for (int y = 0; y < rows; y++)
+		for (int x = 0; x < columns; x++)
+			map[x][y].position.y += cameraSpeed;
+
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		objects[i]->position.y += cameraSpeed;
+
+		if (dynamic_cast<CAR*>(objects[i]) != NULL)
+		{
+			objects[i]->self_update(ObjModel[0]->position.w, windowPos.w);
+		}
+		if (dynamic_cast<ANIMAL*>(objects[i]) != NULL)
+		{
+			objects[i]->self_update(ObjModel[6]->position.w, windowPos.w);
+		}
+		if (dynamic_cast<STICK*>(objects[i]) != NULL)
+		{
+			objects[i]->self_update(ObjModel[1]->position.w, windowPos.w);
+		}
+
+		if (dynamic_cast<TRAIN*>(objects[i]) != NULL)
+		{
+			if (objects[i]->isMoving)
+			{
+				if (objects[i]->dir == LEFT && objects[i]->position.x < -ObjModel[2]->position.w)
+				{
+					objects[i]->position.x = windowPos.w;
+					objects[i]->isMoving = false;
+					objects[i + 1]->change_skin(0); // We Are Sure there is a lamp just after a train!!
+					objects[i]->timer = ((rand() % 5) + 2) * FPS;
+				}
+				else if (objects[i]->dir == RIGHT && objects[i]->position.x > windowPos.w)
+				{
+					objects[i]->position.x = -ObjModel[2]->position.w;
+					objects[i]->isMoving = false;
+					objects[i + 1]->change_skin(0);
+					objects[i]->timer = ((rand() % 5) + 2) * FPS;
+				}
+			}
+			else {
+				if (objects[i]->timer == FPS)
+				{  //1 Second Before it move we should change the lamp!!
+					objects[i + 1]->change_skin(1);
+					Playsound(ObjModel[3]);
+				}
+				if (objects[i]->timer == 0)
+				{
+					objects[i]->isMoving = true;
+					Playsound(ObjModel[3]);
+				}
+				else
+					objects[i]->timer--;
+			}
+			if (objects[i]->isMoving)
+			{
+				objects[i]->position.x += (objects[i]->dir == LEFT ? -trainMoveSpeed : trainMoveSpeed);
+			}
+		}
+	}
+
+	if (map[0][rows - 1].position.y > windowPos.h)
+	{
+		for (int y = rows - 1; y > 0; y--)
+			for (int x = 0; x < columns; x++)
+				map[x][y] = map[x][y - 1];
+
+		generateTiles(0);
+		deleteObjects();
+
+		for (size_t i = 0; i < objects.size(); i++)
+			objects[i]->tile.y += 1;
+		addObjects(0);
+		Player.tile.y += 1;
+	}
+	Player.position.y += cameraSpeed;
+
+	checkPlayerStatus();
+}
+void Game::PlayerMove()
+{
+	if (Player.isMoving)
+	{
+		switch (Player.dir)
+		{
+		case UP:
+			Player.position.y -= playerMoveSpeed;
+			if (Player.position.y <= map[Player.tile.x][Player.tile.y - 1].position.y)
+			{
+				Player.isMoving = false;
+				score++;
+				Player.tile.y--;
+				Player.position.y = map[Player.tile.x][Player.tile.y].position.y;
+				if (map[Player.tile.x][Player.tile.y].type == ROAD)
+				{
+					if (map[Player.tile.x][Player.tile.y].skin == 0) Playsound(ObjModel[0]);
+					else Playsound(ObjModel[6]);
+				}
+				else if (map[Player.tile.x][Player.tile.y].type == WATER) Playsound(ObjModel[1]);
+			}
+			break;
+		case RIGHT:
+			Player.position.x += playerMoveSpeed;
+			if (Player.position.x >= map[Player.tile.x + 1][Player.tile.y].position.x)
+			{
+				Player.isMoving = false;
+				Player.tile.x++;
+				Player.position.x = map[Player.tile.x][Player.tile.y].position.x;
+			}
+			break;
+		case LEFT:
+			Player.position.x -= playerMoveSpeed;
+			if (Player.position.x <= map[Player.tile.x - 1][Player.tile.y].position.x)
+			{
+				Player.isMoving = false;
+				Player.tile.x--;
+				Player.position.x = map[Player.tile.x][Player.tile.y].position.x;
+			}
+			break;
+		case DOWN:
+			Player.position.y += playerMoveSpeed;
+			if (Player.position.y >= map[Player.tile.x][Player.tile.y + 1].position.y)
+			{
+				Player.isMoving = false;
+				score--;
+				Player.tile.y++;
+				Player.position.y = map[Player.tile.x][Player.tile.y].position.y;
+			}
+			break;
+		}
+	}
+}
