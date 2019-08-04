@@ -25,5 +25,6 @@ public:
 	void UIdraw();
 	void pause();
 	void game_over();
+	void start();
 };
 

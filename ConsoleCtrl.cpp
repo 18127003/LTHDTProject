@@ -79,3 +79,20 @@ void ConsoleCtrl::game_over()
 	}
 	if (QuitButton.clickOnButton(gameEvent, onSound)) new_game.SetState(QUIT);
 }
+
+void ConsoleCtrl::start()
+{
+	Logo.self_draw();
+	ClickButton.self_draw();
+	PlayerChooseButton.self_draw();
+	if (onSound == true) SoundButton.self_draw();
+	else OffSoundButton.self_draw();
+	if (PlayerChooseButton.clickOnButton(gameEvent, onSound))
+		new_game.SetState(CHOOSE_PLAYER);
+	else if (OffSoundButton.clickOnButton(gameEvent, onSound) || SoundButton.clickOnButton(gameEvent, onSound));
+	else if (QuitButton.clickOnButton(gameEvent, onSound)) new_game.SetState(QUIT);
+	else if (gameEvent == G_MOUSEBUTTONDOWN && G_Mouse == G_BUTTON_LEFT)
+	{
+		new_game.SetState(PLAY);
+	}
+}
