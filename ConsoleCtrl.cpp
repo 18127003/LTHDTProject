@@ -118,3 +118,13 @@ void ConsoleCtrl::choose_player()
 		PlayerButton.position.x += 150;
 	}
 }
+void ConsoleCtrl::play()
+{
+	new_game.PlayerMove();
+
+
+	PauseButton.self_draw();
+	if (PauseButton.clickOnButton(gameEvent, onSound)) new_game.SetState(PAUSE);
+	if (QuitButton.clickOnButton(gameEvent, onSound)) new_game.SetState(QUIT);
+	new_game.updateScore();
+}
