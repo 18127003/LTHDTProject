@@ -290,6 +290,13 @@ void Game::destroyTiles() {
 
 	delete[] map;
 }
+template<class T>
+void Game::FreeTileTexture(T obj)
+{
+	size_t s = obj.texture.size();
+	for (size_t i = 0; i < s; ++i) G_DestroyTexture(obj.texture[i]);
+	vector<G_Texture*>().swap(obj.texture);
+}
 void Game::loadTiles()
 {
 	TileModel[0].self_load("assets/image/floor.png", GRASS);
@@ -656,4 +663,40 @@ void Game::SetPlayerTexture(G_Texture* txture)
 			break;
 		}
 	}
+}
+int Game::NewTopScore()
+{
+	if (maxScore > topScore) topScore = maxScore;
+	return topScore;
+}
+void Game::Reload()
+{
+	destroyTiles();
+	size_t s = objects.size();
+	for (size_t i = 0; i < s; ++i)
+	{
+		delete objects[i];
+	}
+	objects.clear();
+	maxScore = score = coins = 0;
+	updateScore();
+	for (int i = 0; i < 7; i++) TileModel[i].change_skin(0);
+	initTiles(); //ReGenerate The Envirement!
+	Player.tile = { columns / 2 , rows - 2 };
+	Player.position = map[Player.tile.x][Player.tile.y].position;
+	Player.ResetLv();
+	state = START;
+}
+void Game::eagle()
+{
+	ObjModel[4]->position.y += ObjModel[4]->moveSpeed;
+	G_Draw(ObjModel[4]->texture[ObjModel[4]->skin], &ObjModel[4]->position);
+	if (!eagleIntersection && SDL_HasIntersection(&Player.position, &ObjModel[4]->position)) {
+		Player.position.x = windowPos.w; //Move it to a hidden Area
+		Playsound(ObjModel[4]);
+		eagleIntersection = true;
+	}
+
+	if (ObjModel[4]->position.y > windowPos.h)
+		state = GAME_OVER;
 }

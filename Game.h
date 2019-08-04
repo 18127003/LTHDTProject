@@ -76,3 +76,9 @@ public:
 	void RetrieveScore(string path);
 	G_Texture* GetPlayerTexture(int i);
 	void SetPlayerTexture(G_Texture* txture);
+	int NewTopScore();
+	void Reload();
+	void eagle();
+	template<class T>
+	void FreeTileTexture(T obj);
+};
