@@ -99,8 +99,11 @@ public:
 };
 class EAGLE :public Object
 {
+private:
+
 public:
 	void self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move);
+	~EAGLE();
 };
 class COIN :public Object
 {
