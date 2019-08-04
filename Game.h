@@ -48,3 +48,7 @@ public:
 	void addStick(int row);
 	void addTrain(int row);
 	void addCoins(int row);
+	void addObjects(int row);
+	template<class O, class T >
+	void addEnemy(T* obj, int row);
+	void deleteObjects();

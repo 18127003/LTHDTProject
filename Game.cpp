@@ -171,3 +171,50 @@ void Game::addCoins(int row)
 		}
 	}
 }
+void Game::addObjects(int row)
+{
+	if (map[0][row].type != WATER) addCoins(row);
+	switch (map[0][row].type)
+	{
+	case ROAD:
+		if (map[0][row].skin == 0) addEnemy<CAR>(ObjModel[0], row);
+		else addEnemy<ANIMAL>(ObjModel[6], row);
+		break;
+	case WATER:
+		addStick(row);
+		break;
+	case RAIL:
+		addTrain(row);
+		break;
+	}
+}
+template<class O, class T>
+void Game::addEnemy(T*obj, int row)
+{
+	Direction dir = (Direction)((rand() % 2) + 2);
+	obj->dir = dir;
+	obj->position.y = map[0][row].position.y;
+	obj->tile.y = row;
+	obj->moveSpeed = (rand() % 5 + 2) * (dir == RIGHT ? 1 : -1);
+	int num = (rand() % 3) + 1;
+	int space = (windowPos.w - ((num - 1) * obj->position.w)) / num;
+	int randPos = rand() % windowPos.w;
+	for (int i = 0; i < num; i++)
+	{
+		Object* Prefab = new O(obj);
+		objects.push_back(Prefab);////////////////////////////////////////////////////////
+		if (dir == LEFT)
+			objects.back()->position.x = windowPos.w + (i*(space + obj->position.w)) - randPos;
+		else
+			objects.back()->position.x = -obj->position.w - (i*(space + obj->position.w)) + randPos;
+		objects.back()->random_skin();
+	}
+}
+void Game::deleteObjects()
+{
+	while (!objects.empty() && objects.front()->tile.y == rows - 1)
+	{
+		delete objects[0];
+		objects.pop_front();
+	}
+}
