@@ -277,3 +277,52 @@ void Game::destroyTiles() {
 
 	delete[] map;
 }
+void Game::loadTiles()
+{
+	TileModel[0].self_load("assets/image/floor.png", GRASS);
+	TileModel[0].add_texture("assets/image/floor1.png");
+	TileModel[2].self_load("assets/image/streetlamp.png", TREE);
+	TileModel[2].add_texture("assets/image/crystal.png");
+	TileModel[1].self_load("assets/image/tree.png", TREE);
+	TileModel[1].add_texture("assets/image/lava.png");
+	TileModel[3].self_load("assets/image/sea.png", WATER);
+	TileModel[4].self_load("assets/image/street.png", ROAD);
+	TileModel[4].add_texture("assets/image/grass.png");
+	TileModel[5].self_load("assets/image/rail.png", RAIL);
+	TileModel[5].add_texture("assets/image/rail1.png");
+	TileModel[6].self_load("assets/image/gate.png", GATE);
+	cout << "Load tile complete" << endl;
+}
+void Game::loadObjects()
+{
+	ObjModel[0]->self_load("assets/image/car.png", 0, 0, 169, 100, "assets/sound/car-horn.wav", true);
+	ObjModel[0]->add_texture("assets/image/car2.png");
+	ObjModel[0]->add_texture("assets/image/car3.png");
+	ObjModel[6]->self_load("assets/image/turtle.png", 0, 0, 169, 100, "assets/sound/animal_horn.wav", true);
+	ObjModel[6]->add_texture("assets/image/sheep.png");
+	ObjModel[1]->self_load("assets/image/stick1.png", 0, 0, 100, 100, "assets/sound/water.wav", false);
+	ObjModel[2]->self_load("assets/image/train.png", 0, 0, 544, 100, "assets/sound/train_pass_no_horn.wav", false);
+	ObjModel[2]->add_texture("assets/image/train2.png");
+	ObjModel[3]->self_load("assets/image/green-lamp.png", 0, 0, 39, 93, "assets/sound/train_alarm.wav", false);
+	ObjModel[3]->add_texture("assets/image/red-lamp.png");
+	ObjModel[4]->self_load("assets/image/eagle.png", 0, 0, 350, 250, "assets/sound/eagle_hit.wav", false);
+	ObjModel[5]->self_load("assets/image/coin.png", windowPos.w - 100, 20, 100, 100, "assets/sound/coin_tap.wav", false);
+	cout << "Load object complete" << endl;
+}
+void Game::loadPlayer()
+{
+	Player.tile = { columns / 2, rows - 2 };
+	Player.load_player("assets/image/player.png", map[Player.tile.x][Player.tile.y].position, "assets/sound/car_squish.wav");
+	Player.add_texture("assets/image/player2.png");
+	Player.add_texture("assets/image/player3.png");
+	Player.add_texture("assets/image/player_die.png");
+	cout << "load player complete" << endl;
+}
+void Game::load()
+{
+	loadTiles();
+	loadObjects();
+	initTiles();
+	loadPlayer();
+
+}

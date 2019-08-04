@@ -54,3 +54,7 @@ public:
 	void addEnemy(T* obj, int row);
 	void deleteObjects();
 	void destroyTiles();
+	void load();
+	void loadTiles();
+	void loadObjects();
+	void loadPlayer();
