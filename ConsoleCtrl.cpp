@@ -96,3 +96,25 @@ void ConsoleCtrl::start()
 		new_game.SetState(PLAY);
 	}
 }
+
+void ConsoleCtrl::choose_player()
+{
+	int num = 3;
+	PlayerButton.position = { (new_game.windowPos.w - (num * 150 - 50)) / 2,(new_game.windowPos.h - 100) / 2,100,100 };
+	for (int i = 0; i < num; i++)
+	{
+		PlayerButton.settexture(new_game.GetPlayerTexture(i));
+		if (PlayerButton.clickOnButton(gameEvent, onSound))
+		{
+			new_game.SetPlayerTexture(PlayerButton.Get_texture());
+			new_game.SetState(START);
+			break;
+		}
+		SDL_SetRenderDrawColor(renderer, 0, 196, 255, 255);
+		SDL_RenderFillRect(renderer, &PlayerButton.position);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+		SDL_RenderDrawRect(renderer, &PlayerButton.position);
+		PlayerButton.self_draw();
+		PlayerButton.position.x += 150;
+	}
+}

@@ -26,5 +26,6 @@ public:
 	void pause();
 	void game_over();
 	void start();
+	void choose_player();
 };
 
