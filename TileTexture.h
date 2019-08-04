@@ -15,6 +15,7 @@ public:
 	TileTexture();
 	~TileTexture();
 	void self_draw();
+	void self_load(const char* file, enum TileType ttype);
 	friend class Game;
 };
 
