@@ -20,5 +20,6 @@ public:
 	static bool onSound;
 	ConsoleCtrl();
 	~ConsoleCtrl();
+	void loadUI();
 };
 
