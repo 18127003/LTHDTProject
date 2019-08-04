@@ -76,6 +76,59 @@ void Game::initTiles()
 		}
 	}
 }
+void Game::generateTiles(int row)
+{
+	int rowChance = rand() % 100 + 1;
+	int Trees = 0;
+	TileModel[4].change_skin(rand() % 2);
+	for (int x = 0; x < columns; x++)
+	{
+		if (Gate < Player.Level() && score > 0 && map[columns / 2][row - 1].type != GATE)
+		{
+			if (x == columns / 2) map[x][row] = TileModel[6];
+			else map[x][row] = TileModel[1];
+			Gate++;
+		}
+		else
+		{
+			if (rowChance <= 50 /*rowType == GRASS*/)
+			{
+				int chance = rand() % 100 + 1;
+				if (x == 0 || x == columns - 1)
+					map[x][row] = TileModel[1];
+				else {
+					if (chance >= 80 && Trees < maxTreesInARow)
+					{
+						if (rand() % 3 == 1)
+						{
+							map[x][row] = TileModel[2];
+						}
+						else map[x][row] = TileModel[1];
+						Trees++;
+					}
+					else
+					{
+						map[x][row] = TileModel[0];
+					}
+				}
+			}
+			else if (rowChance <= 70 /*rowType == ROAD*/)
+			{
+				map[x][row] = TileModel[4];
+			}
+			else if (rowChance <= 75 /*rowType == RAIL*/)
+			{
+				map[x][row] = TileModel[5];
+			}
+			else if (rowChance <= 100 /*rowType == WATER*/)
+			{
+				map[x][row] = TileModel[3];
+			}
+		}
+		map[x][row].position.x = x * 100;
+		map[x][row].position.y = map[x][row + 1].position.y - TILE_LENGTH;
+	}
+}
 void Game::addStick(int row)
 {
 	ObjModel[1]->position.y = map[0][row].position.y;
@@ -217,4 +270,10 @@ void Game::deleteObjects()
 		delete objects[0];
 		objects.pop_front();
 	}
+}
+void Game::destroyTiles() {
+	for (int i = 0; i < rows; i++)
+		delete[] map[i];
+
+	delete[] map;
 }

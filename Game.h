@@ -45,6 +45,7 @@ public:
 	void drawObjects();
 	void drawTiles();
 	void initTiles();
+	void generateTiles(int row);
 	void addStick(int row);
 	void addTrain(int row);
 	void addCoins(int row);
@@ -52,3 +53,4 @@ public:
 	template<class O, class T >
 	void addEnemy(T* obj, int row);
 	void deleteObjects();
+	void destroyTiles();
