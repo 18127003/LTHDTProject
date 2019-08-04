@@ -144,3 +144,10 @@ void Player::load_player(const char *file, G_Rect pos, const char *sfile)
 	position = pos;
 	sound = G_LoadSound(sfile);
 }
+Player::~Player()
+{
+	cout << "Player deleted" << endl;
+	size_t s = texture.size();
+	for (size_t i = 0; i < s; ++i) G_DestroyTexture(texture[i]);
+	G_FreeSound(sound);
+}

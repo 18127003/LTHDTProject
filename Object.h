@@ -37,9 +37,15 @@ public:
 
 class Player : public Object
 {
+private:
+	int level = 0;
 public:
 	void self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move);
 	void load_player(const char *file, G_Rect pos, const char *sfile);
+	void LevelUp() { level++; }
+	int Level() { return level; }
+	void ResetLv() { level = 1; }
+	~Player();
 };
 class CAR :public Object
 {
