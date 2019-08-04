@@ -4,20 +4,16 @@
 
 TileTexture::TileTexture()
 {
+	texture.reserve(3);
 }
 
 
 TileTexture::~TileTexture()
 {
+	vector <G_Texture*>().swap(texture);
 }
 
 void TileTexture::self_draw()
 {
-	G_Draw(texture, &position);
-}
-void TileTexture::self_load(const char* file, enum TileType ttype)
-{
-	texture = G_LoadImage(file);
-	position = { 0,0,100,100 };
-	type = ttype;
+	G_Draw(texture[skin], &position);
 }
