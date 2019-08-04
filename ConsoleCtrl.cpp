@@ -163,3 +163,23 @@ void ConsoleCtrl::game()
 	t.join();
 	i.join();
 }
+void ConsoleCtrl::checkSound()
+{
+	while (new_game.IsState(QUIT) == false)
+	{
+		if (onSound == true)              //Check sound
+		{
+			if (SoundButton.clickOnButton(gameEvent, onSound))
+			{
+				onSound = false;
+			}
+		}
+		else if (onSound == false)
+		{
+			if (OffSoundButton.clickOnButton(gameEvent, onSound))
+			{
+				onSound = true;
+			}
+		}
+	}
+}

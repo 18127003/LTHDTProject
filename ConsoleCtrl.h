@@ -29,5 +29,6 @@ public:
 	void choose_player();
 	void play();
 	void game();
+	void checkSound();
 };
 
