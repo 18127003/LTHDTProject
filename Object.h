@@ -26,6 +26,7 @@ public:
 	bool Is_move() { return isMoving; }
 	//void load_player(const char *file, G_Rect pos, const char *sfile);
 	void add_texture(const char *file);
+	void random_skin();
 	void change_skin(size_t n);
 	Object();
 	Object(const Object& other);

@@ -78,8 +78,10 @@ void Object::change_skin(size_t n)
 	if (n >= texture.size()) n = 0;
 	skin = n;
 }
-
-
+void Object::random_skin()
+{
+	change_skin(rand() % texture.size());
+}
 void Player::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
 {
 	texture.push_back(G_LoadImage(file));
