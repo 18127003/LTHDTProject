@@ -70,3 +70,9 @@ public:
 	void update();
 	void SetState(enum GameState stat) { state = stat; }
 	void PlayerMove();
+	bool Player_isMove();
+	bool IsState(enum GameState stat);
+	void SaveScoreToFile(string path);
+	void RetrieveScore(string path);
+	G_Texture* GetPlayerTexture(int i);
+	void SetPlayerTexture(G_Texture* txture);

@@ -615,3 +615,45 @@ void Game::PlayerMove()
 		}
 	}
 }
+bool Game::Player_isMove()
+{
+	return Player.isMoving;
+}
+bool Game::IsState(enum GameState stat)
+{
+	if (state == stat) return true;
+	return false;
+}
+void Game::SaveScoreToFile(string path)
+{
+	ofstream out_file(path);
+	if (!out_file) cout << "Can not save." << endl;
+	out_file << topScore;
+	out_file.close();
+}
+void Game::RetrieveScore(string path)
+{
+	ifstream in_file(path);
+	if (!in_file)
+	{
+		topScore = 0;
+		cout << "High score was not initialized.";
+	}
+	in_file >> topScore;
+	in_file.close();
+}
+G_Texture* Game::GetPlayerTexture(int i)
+{
+	return Player.texture[i];
+}
+void Game::SetPlayerTexture(G_Texture* txture)
+{
+	for (size_t i = 0; i < Player.texture.size(); i++)
+	{
+		if (Player.texture[i] == txture)
+		{
+			Player.change_skin(i);
+			break;
+		}
+	}
+}
