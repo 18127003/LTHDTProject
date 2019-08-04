@@ -9,7 +9,7 @@ int COIN::instance = 0;
 int ANIMAL::instance = 0;
 Object::Object()
 {
-
+	texture.reserve(5);
 }
 
 Object::Object(const Object& other)
@@ -27,6 +27,10 @@ Object::Object(const Object& other)
 
 Object::~Object()
 {
+	
+	vector <G_Texture*>().swap(texture);
+	sound = NULL;
+	
 }
 
 void Object::self_draw()
