@@ -1,7 +1,12 @@
 #include "pch.h"
 #include "Object.h"
 
-
+int CAR::instance = 0;
+int STICK::instance = 0;
+int TRAIN::instance = 0;
+int LAMP::instance = 0;
+int COIN::instance = 0;
+int ANIMAL::instance = 0;
 Object::Object()
 {
 
