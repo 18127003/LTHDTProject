@@ -16,6 +16,8 @@ public:
 	~TileTexture();
 	void self_draw();
 	void self_load(const char* file, enum TileType ttype);
+	void add_texture(const char* file);
+	void change_skin(size_t n);
 	friend class Game;
 };
 
