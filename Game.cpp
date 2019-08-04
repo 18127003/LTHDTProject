@@ -326,3 +326,66 @@ void Game::load()
 	loadPlayer();
 
 }
+void Game::CheckObstacle(int i)
+{
+	switch (i)
+	{
+	case 0:
+		if (map[Player.tile.x][Player.tile.y - 1].type != TREE && map[Player.tile.x][Player.tile.y - 1].type != GATE)//normal tile
+		{
+			Player.isMoving = true;
+			Player.dir = UP;
+			//Player.position.y -= playerMoveSpeed;
+		}
+		if (map[Player.tile.x][Player.tile.y - 1].type == GATE)//gate tile
+		{
+			if (coins > score / 3)
+			{
+				Player.isMoving = true;
+				Player.dir = UP;
+				//Player.LevelUp();
+			}
+		}
+		//tree tile
+		break;
+	case 1:
+		if (Player.tile.x + 1 < columns && map[Player.tile.x + 1][Player.tile.y].type != TREE)
+		{
+			Player.isMoving = true;
+			Player.dir = RIGHT;
+			//Player.position.x += playerMoveSpeed;
+		}
+		break;
+	case 2:
+		if (Player.tile.x - 1 >= 0 && map[Player.tile.x - 1][Player.tile.y].type != TREE)
+		{
+			Player.isMoving = true;
+			Player.dir = LEFT;
+			//Player.position.x -= playerMoveSpeed;
+		}
+		break;
+	case 3:
+		if (Player.tile.y + 1 < rows && map[Player.tile.x][Player.tile.y + 1].type != TREE)
+		{
+			Player.isMoving = true;
+			Player.dir = DOWN;
+			//Player.position.y += playerMoveSpeed;
+		}
+		break;
+	}
+}
+void Game::updateScore()// repair
+{
+	if (score > 0 && score % 50 == 0) Player.LevelUp();
+	if (score > maxScore) maxScore = score;
+}
+template<class T>
+void Game::Playsound(T& obj)
+{
+	if (ConsoleCtrl::onSound == true) obj.Playsound();
+}
+template<class T>
+void Game::Playsound(T* obj)
+{
+	if (ConsoleCtrl::onSound == true) obj->Playsound();
+}

@@ -58,3 +58,9 @@ public:
 	void loadTiles();
 	void loadObjects();
 	void loadPlayer();
+	void CheckObstacle(int i);
+	void updateScore();
+	template<class T>
+	void Playsound(T& obj);
+	template<class T>
+	void Playsound(T* obj);
