@@ -62,3 +62,20 @@ void ConsoleCtrl::pause()
 	else if (gameEvent == G_MOUSEBUTTONDOWN && G_Mouse == G_BUTTON_LEFT)
 		new_game.SetState(PLAY);
 }
+
+void ConsoleCtrl::game_over()
+{
+	GameOver.self_draw();
+	TryAgainButton.self_draw();
+	G_DestroyTexture(TopScoreText.texture);
+	string all = "TOP " + to_string(new_game.NewTopScore());
+	strcpy_s(chars, 10, all.c_str());
+	TopScoreText.texture = G_LoadFont(font, chars, 255, 255, 255);
+	TopScoreText.self_draw();
+	new_game.SaveScoreToFile("topScore.txt");
+	if (TryAgainButton.clickOnButton(gameEvent, onSound))
+	{
+		new_game.Reload();
+	}
+	if (QuitButton.clickOnButton(gameEvent, onSound)) new_game.SetState(QUIT);
+}

@@ -24,5 +24,6 @@ public:
 	void update_score();
 	void UIdraw();
 	void pause();
+	void game_over();
 };
 
