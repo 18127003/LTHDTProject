@@ -30,5 +30,6 @@ public:
 	void play();
 	void game();
 	void checkSound();
+	void input();
 };
 

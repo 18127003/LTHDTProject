@@ -183,3 +183,30 @@ void ConsoleCtrl::checkSound()
 		}
 	}
 }
+void ConsoleCtrl::input()
+{
+	while (new_game.IsState(QUIT) == false)
+	{
+		while (new_game.IsState(PLAY) == true)
+		{
+
+			if (gameEvent == G_KEYDOWN && new_game.Player_isMove() == false && event.key.repeat == 0)
+			{
+				switch (G_Keyboard) {
+				case GK_UP:
+					new_game.CheckObstacle(0);
+					break;
+				case GK_RIGHT:
+					new_game.CheckObstacle(1);
+					break;
+				case GK_LEFT:
+					new_game.CheckObstacle(2);
+					break;
+				case GK_DOWN:
+					new_game.CheckObstacle(3);
+					break;
+				}
+			}
+		}
+	}
+}
