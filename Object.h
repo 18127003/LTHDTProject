@@ -89,10 +89,13 @@ public:
 };
 class LAMP :public Object
 {
+private:
+	static int instance;
 public:
-	LAMP() = default;
-	LAMP(const Object* other) : Object(*other) {}
+	LAMP() { instance++; };
+	LAMP(const Object* other) : Object(*other) { instance++; }
 	void self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move);
+	~LAMP();
 };
 class EAGLE :public Object
 {
