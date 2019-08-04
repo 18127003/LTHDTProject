@@ -52,6 +52,19 @@ void Game::drawTiles()
 		}
 	}
 }
+void Game::draw() /////Console draw
+{
+	drawTiles();
+	if (state == GAME_OVER)
+	{
+		G_Draw(Player.texture[Player.texture.size() - 1], &Player.position); // If player lose,Draw it Under Objects!!
+	}
+	drawObjects();
+	if (state != GAME_OVER)
+		G_Draw(Player.texture[Player.skin], &Player.position); // But If It is alive , Draw It top of Objects!  
+	ObjModel[5]->position = { windowPos.w - 50,0,50,50 };
+	ObjModel[5]->self_draw();
+}
 void Game::initTiles()
 {
 	columns = (int)ceil(windowPos.w / TILE_LENGTH);
@@ -388,4 +401,81 @@ template<class T>
 void Game::Playsound(T* obj)
 {
 	if (ConsoleCtrl::onSound == true) obj->Playsound();
+}
+void Game::adjustCameraSpeed()
+{
+	if (state == OUT) {
+		cameraSpeed = -2;
+		return;
+	}
+	if (state != PLAY) {
+		cameraSpeed = 0;
+		return;
+	}
+	cameraSpeed = cameraBaseSpeed;
+	switch (Player.tile.y) {
+	case 4:
+		cameraSpeed += 1;
+		break;
+	case 3:
+		cameraSpeed += 3;
+		break;
+	case 2:
+		cameraSpeed += 6;
+		break;
+	case 1:
+		cameraSpeed = playerMoveSpeed;
+		break;
+	}
+}
+void Game::checkPlayerStatus()
+{
+	if (state != PLAY) return;
+
+	if (Player.position.y + 5 >= windowPos.h)
+	{
+		state = OUT;
+		ObjModel[4]->position.x = Player.position.x - (ObjModel[4]->position.w / 2);
+		ObjModel[4]->position.y = -ObjModel[4]->position.h;
+		eagleIntersection = false;
+		return;
+	}
+
+	if (Player.position.x <= -TILE_LENGTH || Player.position.x >= windowPos.w)
+		state = GAME_OVER;
+
+	bool onStick = false;
+	G_Rect temp = { Player.position.x + realPlayerClip.x + 5 , Player.position.y + realPlayerClip.y + 5 , realPlayerClip.w - 5,realPlayerClip.h - 5 };
+	for (size_t i = 0; i < objects.size(); i++) {
+		if (SDL_HasIntersection(&temp, &objects[i]->position) == SDL_TRUE)
+		{
+			if (dynamic_cast<CAR*>(objects[i]) != NULL || dynamic_cast<TRAIN*>(objects[i]) != NULL || dynamic_cast<ANIMAL*>(objects[i]) != NULL)
+			{
+				state = GAME_OVER;
+				Playsound(Player);
+			}
+			else if (dynamic_cast<STICK*>(objects[i]) != NULL)
+			{
+				onStick = true;
+				if (!Player.isMoving) {
+					if (objects[i]->isMoving) Player.position.x += objects[i]->moveSpeed;
+					if (Player.position.x >= map[Player.tile.x][0].position.x + TILE_LENGTH) Player.tile.x++;
+					else if (Player.position.x <= map[Player.tile.x][0].position.x - TILE_LENGTH) Player.tile.x--;
+					if (Player.tile.x >= columns || Player.tile.x < 0) state = GAME_OVER;
+				}
+			}
+			else if (dynamic_cast<COIN*>(objects[i]) != NULL)
+			{
+				coins++;
+				Playsound(ObjModel[5]);
+				updateScore();
+				delete objects[i];
+				objects.erase(objects.begin() + i);
+				i--;
+				continue;
+			}
+		}
+	}
+	if (!Player.isMoving && !onStick && map[Player.tile.x][Player.tile.y].type == WATER)
+		state = GAME_OVER;
 }

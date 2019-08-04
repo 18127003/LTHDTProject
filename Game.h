@@ -44,6 +44,7 @@ public:
 	~Game();
 	void drawObjects();
 	void drawTiles();
+	void draw();
 	void initTiles();
 	void generateTiles(int row);
 	void addStick(int row);
@@ -64,3 +65,5 @@ public:
 	void Playsound(T& obj);
 	template<class T>
 	void Playsound(T* obj);
+	void checkPlayerStatus();
+	void adjustCameraSpeed();
