@@ -22,6 +22,7 @@ protected:
 public:
 	void self_draw(); //G_draw
 	virtual void self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move) = 0;
+	virtual void self_update(int modelposw, int winposw);
 	bool Is_move() { return isMoving; }
 	//void load_player(const char *file, G_Rect pos, const char *sfile);
 	void add_texture(const char *file);

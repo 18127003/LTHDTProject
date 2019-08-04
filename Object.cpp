@@ -44,6 +44,21 @@ void Object::self_load(const char *file, enum ObjectType otype,int pos1, int pos
 	if (otype == COIN) dir = LEFT;
 }
 */
+void Object::self_update(int modelposw, int winposw)
+{
+	if (dir == LEFT && position.x < -modelposw)
+	{
+		position.x = winposw;
+	}
+	else if (dir == RIGHT && position.x > winposw)
+	{
+		position.x = -modelposw;
+	}
+	if (isMoving)
+	{
+		position.x += moveSpeed;
+	}
+}
 void Object::add_texture(const char *file)
 {
 	texture.push_back(G_LoadImage(file));
