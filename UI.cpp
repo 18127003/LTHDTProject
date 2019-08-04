@@ -60,3 +60,9 @@ bool Button::clickOnButton(int& gameEvent, bool onSound)
 	}
 	return false;
 }
+void Button::self_load(const char* file, int pos1, int pos2, int pos3, int pos4, G_Sound* sound = NULL)
+{
+	texture = G_LoadImage(file);
+	position = { pos1,pos2,pos3,pos4 };
+	clickSound = sound;
+}
