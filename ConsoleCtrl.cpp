@@ -128,3 +128,38 @@ void ConsoleCtrl::play()
 	if (QuitButton.clickOnButton(gameEvent, onSound)) new_game.SetState(QUIT);
 	new_game.updateScore();
 }
+void ConsoleCtrl::game()
+{
+
+	new_game.load();
+	srand(time(NULL));
+	thread t(&ConsoleCtrl::checkSound, this);
+	thread i(&ConsoleCtrl::input, this);
+	while (new_game.IsState(QUIT) == false)
+	{
+		startLoop = G_GetTicks();
+		gameEvent = G_Event();
+		new_game.draw();
+		UIdraw();
+		if (new_game.IsState(PAUSE) == false)
+		{
+			new_game.update();
+			update_score();
+		}
+		if (new_game.IsState(START)) start();
+		else if (new_game.IsState(PLAY)) play();
+		else if (new_game.IsState(OUT)) new_game.eagle();
+		else if (new_game.IsState(PAUSE)) pause();
+		else if (new_game.IsState(CHOOSE_PLAYER)) choose_player();
+		else if (new_game.IsState(GAME_OVER)) game_over();
+		if (gameEvent == G_QUIT) new_game.SetState(QUIT);
+		endLoop = G_GetTicks() - startLoop;
+		if (endLoop < delay)
+		{
+			G_Delay(delay - endLoop);
+		}
+		G_Update();
+	}
+	t.join();
+	i.join();
+}
