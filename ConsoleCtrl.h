@@ -21,5 +21,6 @@ public:
 	ConsoleCtrl();
 	~ConsoleCtrl();
 	void loadUI();
+	void update_score();
 };
 

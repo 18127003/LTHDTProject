@@ -37,3 +37,14 @@ void ConsoleCtrl::loadUI()
 	OffSoundButton.self_load("assets/image/offsound.png", 148, new_game.windowPos.h - 120, 100, 100, clickSound);
 	cout << "Load UI complete" << endl;
 }
+
+void ConsoleCtrl::update_score()
+{
+	string all = to_string(new_game.getmaxScore());
+	strcpy_s(chars, 10, all.c_str());
+	ScoreText.self_update(font, chars);
+	all = to_string(new_game.getCoin());
+	strcpy_s(chars, 10, all.c_str());
+	CoinText.self_update(font, chars);
+}
+
