@@ -70,37 +70,7 @@ void Object::self_update(int modelposw, int winposw)
 		position.x += moveSpeed;
 	}
 }
-void CAR::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
-{
-	Object::self_load(file, pos1, pos2, posx, posy, sfile, Is_move);
-}
 
-
-void ANIMAL::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
-{
-	Object::self_load(file, pos1, pos2, posx, posy, sfile, Is_move);
-}
-
-
-void Player::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
-{
-	Object::self_load(file, pos1, pos2, posx, posy, sfile, Is_move);
-}
-
-
-void TRAIN::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
-{
-	Object::self_load(file, pos1, pos2, posx, posy, sfile, Is_move);
-}
-
-void LAMP::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
-{
-	Object::self_load(file, pos1, pos2, posx, posy, sfile, Is_move);
-}
-void STICK::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
-{
-	Object::self_load(file, pos1, pos2, posx, posy, sfile, Is_move);
-}
 
 void EAGLE::self_load(const char *file, int pos1, int pos2, int posx, int posy, const char* sfile, bool Is_move)
 {
