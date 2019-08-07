@@ -27,6 +27,30 @@ Game::~Game()
 	delete[] map;
 	for (int i = 0; i < 7; ++i) delete ObjModel[i];
 	for (int i = 0; i < 7; ++i) FreeTileTexture(TileModel[i]);
+
+
+}
+template<class T>
+void Game::FreeTileTexture(T obj)
+{
+	size_t s = obj.texture.size();
+	for (size_t i = 0; i < s; ++i) G_DestroyTexture(obj.texture[i]);
+	vector<G_Texture*>().swap(obj.texture);
+}
+
+void Game::deleteObjects()
+{
+	while (!objects.empty() && objects.front()->tile.y == rows - 1)
+	{
+		delete objects[0];
+		objects.pop_front();
+	}
+}
+void Game::destroyTiles() {
+	for (int i = 0; i < rows; i++)
+		delete[] map[i];
+
+	delete[] map;
 }
 void Game::drawObjects()
 {
@@ -37,7 +61,7 @@ void Game::drawObjects()
 }
 void Game::drawTiles()
 {
-	if (maxScore == 50)
+	if (rowcnt == 52)
 	{
 		TileModel[0].change_skin(1);
 		TileModel[1].change_skin(1);
@@ -52,31 +76,21 @@ void Game::drawTiles()
 		}
 	}
 }
-void Game::draw() /////Console draw
-{
-	drawTiles();
-	if (state == GAME_OVER)
-	{
-		G_Draw(Player.texture[Player.texture.size() - 1], &Player.position); // If player lose,Draw it Under Objects!!
-	}
-	drawObjects();
-	if (state != GAME_OVER)
-		G_Draw(Player.texture[Player.skin], &Player.position); // But If It is alive , Draw It top of Objects!  
-	ObjModel[5]->position = { windowPos.w - 50,0,50,50 };
-	ObjModel[5]->self_draw();
-}
 void Game::initTiles()
 {
 	columns = (int)ceil(windowPos.w / TILE_LENGTH);
 	rows = (int)ceil(windowPos.h / TILE_LENGTH) + 1;
+	rowcnt += rows;
 	map = new TileTexture*[columns];
 	for (int i = 0; i < columns; i++)
 		map[i] = new TileTexture[rows];
 
 	for (int y = rows - 1; y >= 0; y--)
 	{
-		if (y >= rows - 2) {
-			for (int x = 0; x < columns; x++) {
+		if (y >= rows - 2)
+		{
+			for (int x = 0; x < columns; x++)
+			{
 				map[x][y] = (x == 0 || x == columns - 1) ? TileModel[1] : TileModel[0];
 				map[x][y].position.x = x * 100;
 				map[x][y].position.y = (y - 1) * 100;
@@ -96,7 +110,7 @@ void Game::generateTiles(int row)
 	TileModel[4].change_skin(rand() % 2);
 	for (int x = 0; x < columns; x++)
 	{
-		if (Gate < Player.Level() && score > 0 && map[columns / 2][row - 1].type != GATE)
+		if (rowcnt % 52 == 0 && score > 0 && map[columns / 2][row - 1].type != GATE)
 		{
 			if (x == columns / 2) map[x][row] = TileModel[6];
 			else map[x][row] = TileModel[1];
@@ -140,6 +154,45 @@ void Game::generateTiles(int row)
 		}
 		map[x][row].position.x = x * 100;
 		map[x][row].position.y = map[x][row + 1].position.y - TILE_LENGTH;
+	}
+}
+void Game::addObjects(int row)
+{
+	if (map[0][row].type != WATER) addCoins(row);
+	switch (map[0][row].type)
+	{
+	case ROAD:
+		if (map[0][row].skin == 0) addEnemy<CAR>(ObjModel[0], row);
+		else addEnemy<ANIMAL>(ObjModel[6], row);
+		break;
+	case WATER:
+		addStick(row);
+		break;
+	case RAIL:
+		addTrain(row);
+		break;
+	}
+}
+template<class O, class T>
+void Game::addEnemy(T*obj, int row)
+{
+	Direction dir = (Direction)((rand() % 2) + 2);
+	obj->dir = dir;
+	obj->position.y = map[0][row].position.y;
+	obj->tile.y = row;
+	obj->moveSpeed = (rand() % 5 + 2) * (dir == RIGHT ? 1 : -1);
+	int num = (rand() % 3) + 1;
+	int space = (windowPos.w - ((num - 1) * obj->position.w)) / num;
+	int randPos = rand() % windowPos.w;
+	for (int i = 0; i < num; i++)
+	{
+		Object* Prefab = new O(obj);
+		objects.push_back(Prefab);////////////////////////////////////////////////////////
+		if (dir == LEFT)
+			objects.back()->position.x = windowPos.w + (i*(space + obj->position.w)) - randPos;
+		else
+			objects.back()->position.x = -obj->position.w - (i*(space + obj->position.w)) + randPos;
+		objects.back()->random_skin();
 	}
 }
 void Game::addStick(int row)
@@ -237,204 +290,6 @@ void Game::addCoins(int row)
 		}
 	}
 }
-void Game::addObjects(int row)
-{
-	if (map[0][row].type != WATER) addCoins(row);
-	switch (map[0][row].type)
-	{
-	case ROAD:
-		if (map[0][row].skin == 0) addEnemy<CAR>(ObjModel[0], row);
-		else addEnemy<ANIMAL>(ObjModel[6], row);
-		break;
-	case WATER:
-		addStick(row);
-		break;
-	case RAIL:
-		addTrain(row);
-		break;
-	}
-}
-template<class O, class T>
-void Game::addEnemy(T*obj, int row)
-{
-	Direction dir = (Direction)((rand() % 2) + 2);
-	obj->dir = dir;
-	obj->position.y = map[0][row].position.y;
-	obj->tile.y = row;
-	obj->moveSpeed = (rand() % 5 + 2) * (dir == RIGHT ? 1 : -1);
-	int num = (rand() % 3) + 1;
-	int space = (windowPos.w - ((num - 1) * obj->position.w)) / num;
-	int randPos = rand() % windowPos.w;
-	for (int i = 0; i < num; i++)
-	{
-		Object* Prefab = new O(obj);
-		objects.push_back(Prefab);////////////////////////////////////////////////////////
-		if (dir == LEFT)
-			objects.back()->position.x = windowPos.w + (i*(space + obj->position.w)) - randPos;
-		else
-			objects.back()->position.x = -obj->position.w - (i*(space + obj->position.w)) + randPos;
-		objects.back()->random_skin();
-	}
-}
-void Game::deleteObjects()
-{
-	while (!objects.empty() && objects.front()->tile.y == rows - 1)
-	{
-		delete objects[0];
-		objects.pop_front();
-	}
-}
-void Game::destroyTiles() {
-	for (int i = 0; i < rows; i++)
-		delete[] map[i];
-
-	delete[] map;
-}
-template<class T>
-void Game::FreeTileTexture(T obj)
-{
-	size_t s = obj.texture.size();
-	for (size_t i = 0; i < s; ++i) G_DestroyTexture(obj.texture[i]);
-	vector<G_Texture*>().swap(obj.texture);
-}
-void Game::loadTiles()
-{
-	TileModel[0].self_load("assets/image/floor.png", GRASS);
-	TileModel[0].add_texture("assets/image/floor1.png");
-	TileModel[2].self_load("assets/image/streetlamp.png", TREE);
-	TileModel[2].add_texture("assets/image/crystal.png");
-	TileModel[1].self_load("assets/image/tree.png", TREE);
-	TileModel[1].add_texture("assets/image/lava.png");
-	TileModel[3].self_load("assets/image/sea.png", WATER);
-	TileModel[4].self_load("assets/image/street.png", ROAD);
-	TileModel[4].add_texture("assets/image/grass.png");
-	TileModel[5].self_load("assets/image/rail.png", RAIL);
-	TileModel[5].add_texture("assets/image/rail1.png");
-	TileModel[6].self_load("assets/image/gate.png", GATE);
-	cout << "Load tile complete" << endl;
-}
-void Game::loadObjects()
-{
-	ObjModel[0]->self_load("assets/image/car.png", 0, 0, 169, 100, "assets/sound/car-horn.wav", true);
-	ObjModel[0]->add_texture("assets/image/car2.png");
-	ObjModel[0]->add_texture("assets/image/car3.png");
-	ObjModel[6]->self_load("assets/image/turtle.png", 0, 0, 169, 100, "assets/sound/animal_horn.wav", true);
-	ObjModel[6]->add_texture("assets/image/sheep.png");
-	ObjModel[1]->self_load("assets/image/stick1.png", 0, 0, 100, 100, "assets/sound/water.wav", false);
-	ObjModel[2]->self_load("assets/image/train.png", 0, 0, 544, 100, "assets/sound/train_pass_no_horn.wav", false);
-	ObjModel[2]->add_texture("assets/image/train2.png");
-	ObjModel[3]->self_load("assets/image/green-lamp.png", 0, 0, 39, 93, "assets/sound/train_alarm.wav", false);
-	ObjModel[3]->add_texture("assets/image/red-lamp.png");
-	ObjModel[4]->self_load("assets/image/eagle.png", 0, 0, 350, 250, "assets/sound/eagle_hit.wav", false);
-	ObjModel[5]->self_load("assets/image/coin.png", windowPos.w - 100, 20, 100, 100, "assets/sound/coin_tap.wav", false);
-	cout << "Load object complete" << endl;
-}
-void Game::loadPlayer()
-{
-	Player.tile = { columns / 2, rows - 2 };
-	Player.load_player("assets/image/player.png", map[Player.tile.x][Player.tile.y].position, "assets/sound/car_squish.wav");
-	Player.add_texture("assets/image/player2.png");
-	Player.add_texture("assets/image/player3.png");
-	Player.add_texture("assets/image/player_die.png");
-	cout << "load player complete" << endl;
-}
-void Game::load()
-{
-	loadTiles();
-	loadObjects();
-	initTiles();
-	loadPlayer();
-
-}
-void Game::CheckObstacle(int i)
-{
-	switch (i)
-	{
-	case 0:
-		if (map[Player.tile.x][Player.tile.y - 1].type != TREE && map[Player.tile.x][Player.tile.y - 1].type != GATE)//normal tile
-		{
-			Player.isMoving = true;
-			Player.dir = UP;
-			//Player.position.y -= playerMoveSpeed;
-		}
-		if (map[Player.tile.x][Player.tile.y - 1].type == GATE)//gate tile
-		{
-			if (coins > score / 3)
-			{
-				Player.isMoving = true;
-				Player.dir = UP;
-				//Player.LevelUp();
-			}
-		}
-		//tree tile
-		break;
-	case 1:
-		if (Player.tile.x + 1 < columns && map[Player.tile.x + 1][Player.tile.y].type != TREE)
-		{
-			Player.isMoving = true;
-			Player.dir = RIGHT;
-			//Player.position.x += playerMoveSpeed;
-		}
-		break;
-	case 2:
-		if (Player.tile.x - 1 >= 0 && map[Player.tile.x - 1][Player.tile.y].type != TREE)
-		{
-			Player.isMoving = true;
-			Player.dir = LEFT;
-			//Player.position.x -= playerMoveSpeed;
-		}
-		break;
-	case 3:
-		if (Player.tile.y + 1 < rows && map[Player.tile.x][Player.tile.y + 1].type != TREE)
-		{
-			Player.isMoving = true;
-			Player.dir = DOWN;
-			//Player.position.y += playerMoveSpeed;
-		}
-		break;
-	}
-}
-void Game::updateScore()// repair
-{
-	if (score > 0 && score % 50 == 0) Player.LevelUp();
-	if (score > maxScore) maxScore = score;
-}
-template<class T>
-void Game::Playsound(T& obj)
-{
-	if (ConsoleCtrl::onSound == true) obj.Playsound();
-}
-template<class T>
-void Game::Playsound(T* obj)
-{
-	if (ConsoleCtrl::onSound == true) obj->Playsound();
-}
-void Game::adjustCameraSpeed()
-{
-	if (state == OUT) {
-		cameraSpeed = -2;
-		return;
-	}
-	if (state != PLAY) {
-		cameraSpeed = 0;
-		return;
-	}
-	cameraSpeed = cameraBaseSpeed;
-	switch (Player.tile.y) {
-	case 4:
-		cameraSpeed += 1;
-		break;
-	case 3:
-		cameraSpeed += 3;
-		break;
-	case 2:
-		cameraSpeed += 6;
-		break;
-	case 1:
-		cameraSpeed = playerMoveSpeed;
-		break;
-	}
-}
 void Game::checkPlayerStatus()
 {
 	if (state != PLAY) return;
@@ -485,6 +340,101 @@ void Game::checkPlayerStatus()
 	}
 	if (!Player.isMoving && !onStick && map[Player.tile.x][Player.tile.y].type == WATER)
 		state = GAME_OVER;
+}
+void Game::updateScore()// repair
+{
+	if (score > 0 && score % 50 == 0) Player.LevelUp();
+	if (score > maxScore) maxScore = score;
+}
+//Suspicious
+void Game::eagle()
+{
+	ObjModel[4]->position.y += ObjModel[4]->moveSpeed;
+	G_Draw(ObjModel[4]->texture[ObjModel[4]->skin], &ObjModel[4]->position);
+	if (!eagleIntersection && SDL_HasIntersection(&Player.position, &ObjModel[4]->position)) {
+		Player.position.x = windowPos.w; //Move it to a hidden Area
+		Playsound(ObjModel[4]);
+		eagleIntersection = true;
+	}
+
+	if (ObjModel[4]->position.y > windowPos.h)
+		state = GAME_OVER;
+}
+void Game::loadTiles()
+{
+	TileModel[0].self_load("assets/image/floor.png", GRASS);
+	TileModel[0].add_texture("assets/image/floor1.png");
+	TileModel[2].self_load("assets/image/streetlamp.png", TREE);
+	TileModel[2].add_texture("assets/image/crystal.png");
+	TileModel[1].self_load("assets/image/tree.png", TREE);
+	TileModel[1].add_texture("assets/image/lava.png");
+	TileModel[3].self_load("assets/image/sea.png", WATER);
+	TileModel[4].self_load("assets/image/street.png", ROAD);
+	TileModel[4].add_texture("assets/image/grass.png");
+	TileModel[5].self_load("assets/image/rail.png", RAIL);
+	TileModel[5].add_texture("assets/image/rail1.png");
+	TileModel[6].self_load("assets/image/gate.png", GATE);
+	cout << "Load tile complete" << endl;
+}
+void Game::loadObjects()
+{
+	ObjModel[0]->self_load("assets/image/car.png", 0, 0, 169, 100, "assets/sound/car-horn.wav", true);
+	ObjModel[0]->add_texture("assets/image/car2.png");
+	ObjModel[0]->add_texture("assets/image/car3.png");
+	ObjModel[6]->self_load("assets/image/turtle.png", 0, 0, 169, 100, "assets/sound/animal_horn.wav", true);
+	ObjModel[6]->add_texture("assets/image/sheep.png");
+	ObjModel[1]->self_load("assets/image/stick1.png", 0, 0, 100, 100, "assets/sound/water.wav", false);
+	ObjModel[2]->self_load("assets/image/train.png", 0, 0, 544, 100, "assets/sound/train_pass_no_horn.wav", false);
+	ObjModel[2]->add_texture("assets/image/train2.png");
+	ObjModel[3]->self_load("assets/image/green-lamp.png", 0, 0, 39, 93, "assets/sound/train_alarm.wav", false);
+	ObjModel[3]->add_texture("assets/image/red-lamp.png");
+	ObjModel[4]->self_load("assets/image/eagle.png", 0, 0, 350, 250, "assets/sound/eagle_hit.wav", false);
+	ObjModel[5]->self_load("assets/image/coin.png", windowPos.w - 100, 20, 100, 100, "assets/sound/coin_tap.wav", false);
+	cout << "Load object complete" << endl;
+}
+void Game::loadPlayer()
+{
+	Player.tile = { columns / 2, rows - 2 };
+	Player.load_player("assets/image/player.png", map[Player.tile.x][Player.tile.y].position, "assets/sound/car_squish.wav");
+	Player.add_texture("assets/image/player2.png");
+	Player.add_texture("assets/image/player3.png");
+	Player.add_texture("assets/image/player_die.png");
+	cout << "load player complete" << endl;
+}
+
+void Game::load()
+{
+	loadTiles();
+	loadObjects();
+	initTiles();
+	loadPlayer();
+
+}
+void Game::adjustCameraSpeed()
+{
+	if (state == OUT) {
+		cameraSpeed = -2;
+		return;
+	}
+	if (state != PLAY) {
+		cameraSpeed = 0;
+		return;
+	}
+	cameraSpeed = cameraBaseSpeed;
+	switch (Player.tile.y) {
+	case 4:
+		cameraSpeed += 1;
+		break;
+	case 3:
+		cameraSpeed += 3;
+		break;
+	case 2:
+		cameraSpeed += 6;
+		break;
+	case 1:
+		cameraSpeed = playerMoveSpeed;
+		break;
+	}
 }
 void Game::update()
 {
@@ -556,7 +506,7 @@ void Game::update()
 		for (int y = rows - 1; y > 0; y--)
 			for (int x = 0; x < columns; x++)
 				map[x][y] = map[x][y - 1];
-
+		rowcnt++;
 		generateTiles(0);
 		deleteObjects();
 
@@ -568,6 +518,57 @@ void Game::update()
 	Player.position.y += cameraSpeed;
 
 	checkPlayerStatus();
+}
+int Game::NewTopScore()
+{
+	if (maxScore > topScore) topScore = maxScore;
+	return topScore;
+}
+void Game::Reload()
+{
+	destroyTiles();
+	size_t s = objects.size();
+	for (size_t i = 0; i < s; ++i)
+	{
+		delete objects[i];
+	}
+	objects.clear();
+	maxScore = score = coins = rowcnt = 0;
+	updateScore();
+	for (int i = 0; i < 7; i++) TileModel[i].change_skin(0);
+	initTiles(); //ReGenerate The Envirement!
+	Player.tile = { columns / 2 , rows - 2 };
+	Player.position = map[Player.tile.x][Player.tile.y].position;
+	Player.ResetLv();
+	state = START;
+}
+void Game::draw() /////Console draw
+{
+	drawTiles();
+	if (state == GAME_OVER)
+	{
+		G_Draw(Player.texture[Player.texture.size() - 1], &Player.position); // If player lose,Draw it Under Objects!!
+	}
+	drawObjects();
+	if (state != GAME_OVER)
+		G_Draw(Player.texture[Player.skin], &Player.position); // But If It is alive , Draw It top of Objects!  
+	ObjModel[5]->position = { windowPos.w - 50,0,50,50 };
+	ObjModel[5]->self_draw();
+}
+G_Texture* Game::GetPlayerTexture(int i)
+{
+	return Player.texture[i];
+}
+void Game::SetPlayerTexture(G_Texture* txture)
+{
+	for (size_t i = 0; i < Player.texture.size(); i++)
+	{
+		if (Player.texture[i] == txture)
+		{
+			Player.change_skin(i);
+			break;
+		}
+	}
 }
 void Game::PlayerMove()
 {
@@ -583,6 +584,7 @@ void Game::PlayerMove()
 				score++;
 				Player.tile.y--;
 				Player.position.y = map[Player.tile.x][Player.tile.y].position.y;
+				//Player.position.x = map[Player.tile.x][Player.tile.y].position.x;
 				if (map[Player.tile.x][Player.tile.y].type == ROAD)
 				{
 					if (map[Player.tile.x][Player.tile.y].skin == 0) Playsound(ObjModel[0]);
@@ -622,6 +624,54 @@ void Game::PlayerMove()
 		}
 	}
 }
+void Game::CheckObstacle(int i)
+{
+	switch (i)
+	{
+	case 0:
+		if (map[Player.tile.x][Player.tile.y - 1].type != TREE && map[Player.tile.x][Player.tile.y - 1].type != GATE)//normal tile
+		{
+			Player.isMoving = true;
+			Player.dir = UP;
+			//Player.position.y -= playerMoveSpeed;
+		}
+		if (map[Player.tile.x][Player.tile.y - 1].type == GATE)//gate tile
+		{
+			if (coins > score / 3)
+			{
+				Player.isMoving = true;
+				Player.dir = UP;
+				//Player.LevelUp();
+			}
+		}
+		//tree tile
+		break;
+	case 1:
+		if (Player.tile.x + 1 < columns && map[Player.tile.x + 1][Player.tile.y].type != TREE)
+		{
+			Player.isMoving = true;
+			Player.dir = RIGHT;
+			//Player.position.x += playerMoveSpeed;
+		}
+		break;
+	case 2:
+		if (Player.tile.x - 1 >= 0 && map[Player.tile.x - 1][Player.tile.y].type != TREE)
+		{
+			Player.isMoving = true;
+			Player.dir = LEFT;
+			//Player.position.x -= playerMoveSpeed;
+		}
+		break;
+	case 3:
+		if (Player.tile.y + 1 < rows && map[Player.tile.x][Player.tile.y + 1].type != TREE)
+		{
+			Player.isMoving = true;
+			Player.dir = DOWN;
+			//Player.position.y += playerMoveSpeed;
+		}
+		break;
+	}
+}
 bool Game::Player_isMove()
 {
 	return Player.isMoving;
@@ -649,54 +699,13 @@ void Game::RetrieveScore(string path)
 	in_file >> topScore;
 	in_file.close();
 }
-G_Texture* Game::GetPlayerTexture(int i)
+template<class T>
+void Game::Playsound(T& obj)
 {
-	return Player.texture[i];
+	if (ConsoleCtrl::onSound == true) obj.Playsound();
 }
-void Game::SetPlayerTexture(G_Texture* txture)
+template<class T>
+void Game::Playsound(T* obj)
 {
-	for (size_t i = 0; i < Player.texture.size(); i++)
-	{
-		if (Player.texture[i] == txture)
-		{
-			Player.change_skin(i);
-			break;
-		}
-	}
-}
-int Game::NewTopScore()
-{
-	if (maxScore > topScore) topScore = maxScore;
-	return topScore;
-}
-void Game::Reload()
-{
-	destroyTiles();
-	size_t s = objects.size();
-	for (size_t i = 0; i < s; ++i)
-	{
-		delete objects[i];
-	}
-	objects.clear();
-	maxScore = score = coins = 0;
-	updateScore();
-	for (int i = 0; i < 7; i++) TileModel[i].change_skin(0);
-	initTiles(); //ReGenerate The Envirement!
-	Player.tile = { columns / 2 , rows - 2 };
-	Player.position = map[Player.tile.x][Player.tile.y].position;
-	Player.ResetLv();
-	state = START;
-}
-void Game::eagle()
-{
-	ObjModel[4]->position.y += ObjModel[4]->moveSpeed;
-	G_Draw(ObjModel[4]->texture[ObjModel[4]->skin], &ObjModel[4]->position);
-	if (!eagleIntersection && SDL_HasIntersection(&Player.position, &ObjModel[4]->position)) {
-		Player.position.x = windowPos.w; //Move it to a hidden Area
-		Playsound(ObjModel[4]);
-		eagleIntersection = true;
-	}
-
-	if (ObjModel[4]->position.y > windowPos.h)
-		state = GAME_OVER;
+	if (ConsoleCtrl::onSound == true) obj->Playsound();
 }

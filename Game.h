@@ -1,7 +1,6 @@
 #pragma once
 #include "Object.h"
 #include "TileTexture.h"
-#include "UI.h"
 #include <deque>
 #include <fstream>
 
@@ -28,7 +27,7 @@ private:
 	Player Player;
 	TileTexture TileModel[7];  //(grassTile, treeTile,lampTile, waterTile, roadTile, railTile, gateTile)
 	Object* ObjModel[7];     //(Car,Stick,Train,Lamp,Eagle,Coin,Animal)
-
+	int rowcnt = 0;
 	int rows, columns;
 	bool eagleIntersection = false;
 	int maxScore = 0, score = 0, topScore = 0, coins = 0;
@@ -44,41 +43,43 @@ public:
 	~Game();
 	void drawObjects();
 	void drawTiles();
-	void draw();
 	void initTiles();
 	void generateTiles(int row);
-	void addStick(int row);
-	void addTrain(int row);
-	void addCoins(int row);
 	void addObjects(int row);
 	template<class O, class T >
 	void addEnemy(T* obj, int row);
+	void addStick(int row);
+	void addTrain(int row);
+	void addCoins(int row);
 	void deleteObjects();
+	void checkPlayerStatus();
+	void updateScore();
+	void eagle();
 	void destroyTiles();
 	void load();
 	void loadTiles();
 	void loadObjects();
 	void loadPlayer();
-	void CheckObstacle(int i);
-	void updateScore();
-	template<class T>
-	void Playsound(T& obj);
-	template<class T>
-	void Playsound(T* obj);
-	void checkPlayerStatus();
 	void adjustCameraSpeed();
 	void update();
 	void SetState(enum GameState stat) { state = stat; }
+	int NewTopScore();
+	void Reload();
+	void draw();
+	G_Texture* GetPlayerTexture(int i);
+	void SetPlayerTexture(G_Texture* txture);
 	void PlayerMove();
+	void CheckObstacle(int i);
 	bool Player_isMove();
 	bool IsState(enum GameState stat);
 	void SaveScoreToFile(string path);
 	void RetrieveScore(string path);
-	G_Texture* GetPlayerTexture(int i);
-	void SetPlayerTexture(G_Texture* txture);
-	int NewTopScore();
-	void Reload();
-	void eagle();
 	template<class T>
 	void FreeTileTexture(T obj);
+	template<class T>
+	void Playsound(T& obj);
+	template<class T>
+	void Playsound(T* obj);
+
 };
+
